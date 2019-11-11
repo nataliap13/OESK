@@ -34,18 +34,23 @@ namespace OESK
             InitializeComponent();
             try
             {
-                using (var conn = new SQLiteConnection("db.db"))
+                using (var conn = new SQLiteConnection(@"Data Source=.\Database\db.db"))
+                //using (var conn = new SQLiteConnection("Data Source=Database\\db.db"))
                 //using (var conn = new SQLiteConnection("Data Source=db.db;"))
                 //using (var conn = new SQLiteConnection("Database=db.db"))
                 //using (var conn = new SQLiteConnection("AttachDbFilename=db.db"))
                 //using (var conn = new SQLiteConnection("Data Source=db.db; AttachDbFilename=db.db"))
                 {
-                    MessageBox.Show("Hello");
                     var a = conn.TableAlgorithm.ToList();
                     MessageBox.Show(a.Count().ToString());
 
                     var result = conn.TableAlgorithm.Where(x => x.Name.Length > 0).Count();
                     MessageBox.Show(result.ToString());
+                    /*
+                    var A = new TableAlgorithm();
+                    A.Name = "SHA512";
+                    conn.TableAlgorithm.Add(A);
+                    conn.SaveChanges();*/
                 }
             }
             catch (Exception e)
