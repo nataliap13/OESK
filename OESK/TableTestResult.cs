@@ -22,7 +22,7 @@ namespace OESK
         public virtual TableText TableText { get; set; }
 
 
-        public int CalculationTime { get; set; }
+        public string CalculationTime { get; set; }
 
        
     }

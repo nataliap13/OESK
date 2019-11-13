@@ -17,7 +17,6 @@ using System.Windows.Navigation;
 //using System.Windows.Shapes;
 //using System.Management;
 
-
 namespace OESK
 {
     /// <summary>
@@ -28,30 +27,24 @@ namespace OESK
         private MD5 md5Hash = MD5.Create();
         private SHA1 sha1Hash = SHA1.Create();
         private SHA256 sha256Hash = SHA256.Create();
-        private MySQLiteDbContext dbConnection = new MySQLiteDbContext();
+        private MySQLiteDbContext conn = new MySQLiteDbContext();
         public MainWindow()
         {
             InitializeComponent();
+            /*
             try
             {
                 //using (var conn = new SQLiteConnection("Data Source=db.db; Version=3; New=False; Compress=True;"))
-                var conn = new MySQLiteDbContext();
+                //var conn = new MySQLiteDbContext();
                 var a = conn.TableAlgorithm.ToList();
                 MessageBox.Show(a.Count().ToString());
-                /*
-                var A = new TableAlgorithm();
-                A.Name = "SHA512";
-                conn.TableAlgorithm.Add(A);
-                conn.SaveChanges();*/
             }
             catch (Exception e)
             {
                 MessageBox.Show("Error: " + e.Message);
                 MessageBox.Show("Error: " + e.InnerException);
-            }
+            }*/
         }
-
-
 
         private string buildHashString(byte[] data)
         {
@@ -140,18 +133,53 @@ namespace OESK
 
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
-            TimeSpan time;
-            string hash = GetMd5Hash(UserTxtBox.Text, out time);
+            TimeSpan timeOfCalculation;
+            var text = UserTxtBox.Text;
+            string hash = GetMd5Hash(text, out timeOfCalculation);
             MD5TxtBlockHash.Text = hash;
-            MD5TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", time);
+            MD5TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
+            SaveTestToDatabase(text, timeOfCalculation, "MD5");
 
-            hash = GetSHA1Hash(UserTxtBox.Text, out time);
+            hash = GetSHA1Hash(text, out timeOfCalculation);
             SHA1TxtBlockHash.Text = hash;
-            SHA1TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", time);
+            SHA1TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
+            SaveTestToDatabase(text, timeOfCalculation, "SHA1");
 
-            hash = GetSHA256Hash(UserTxtBox.Text, out time);
+            hash = GetSHA256Hash(text, out timeOfCalculation);
             SHA256TxtBlockHash.Text = hash;
-            SHA256TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", time);
+            SHA256TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
+            SaveTestToDatabase(text, timeOfCalculation, "SHA256");
+        }
+
+        private void SaveTestToDatabase(string sourceText, TimeSpan timeofCalculation, string AlgorithmName)
+        {
+            var now = DateTime.Now;
+            var entryTest = new TableTest();
+            entryTest.DateTime = now.ToString();
+            entryTest = conn.TableTest.Add(entryTest);
+
+            var listOfTexts = conn.TableText.Where(x => x.Text == sourceText).ToList();
+            var IDText = 0;
+            if (listOfTexts.Count() == 0)
+            {
+                var entryText = new TableText();
+                entryText.Text = sourceText;
+                entryText = conn.TableText.Add(entryText);
+                IDText = entryText.IDText;
+            }
+            else { IDText = listOfTexts.First().IDText; }
+
+            var entryTestResult = new TableTestResult();
+            entryTestResult.IDTest = entryTest.IDTest;
+            entryTestResult.IDAlgorithm = conn.TableAlgorithm.Where(x => x.Name == AlgorithmName).First().IDAlgorithm;
+            entryTestResult.IDText = IDText;
+            entryTestResult.CalculationTime = timeofCalculation.ToString();
+            entryTestResult = conn.TableTestResult.Add(entryTestResult);
+            try
+            { conn.SaveChanges(); }
+            catch (Exception e)
+            { MessageBox.Show(e.Message); }
+
         }
     }
 }
