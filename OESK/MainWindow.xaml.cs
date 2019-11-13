@@ -14,10 +14,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
+//using System.Windows.Shapes;
+//using System.Management;
 
-using System.Data.Entity;
-using System.ComponentModel.DataAnnotations;
 
 namespace OESK
 {
@@ -29,28 +28,30 @@ namespace OESK
         private MD5 md5Hash = MD5.Create();
         private SHA1 sha1Hash = SHA1.Create();
         private SHA256 sha256Hash = SHA256.Create();
+        private MySQLiteDbContext dbConnection = new MySQLiteDbContext();
         public MainWindow()
         {
             InitializeComponent();
             try
             {
-                using (var conn = new SQLiteConnection("db.db"))
-                //using (var conn = new SQLiteConnection("Data Source=db.db;"))
-                //using (var conn = new SQLiteConnection("Database=db.db"))
-                //using (var conn = new SQLiteConnection("AttachDbFilename=db.db"))
-                //using (var conn = new SQLiteConnection("Data Source=db.db; AttachDbFilename=db.db"))
-                {
-                    MessageBox.Show("Hello");
-                    var a = conn.TableAlgorithm.ToList();
-                    MessageBox.Show(a.Count().ToString());
-
-                    var result = conn.TableAlgorithm.Where(x => x.Name.Length > 0).Count();
-                    MessageBox.Show(result.ToString());
-                }
+                //using (var conn = new SQLiteConnection("Data Source=db.db; Version=3; New=False; Compress=True;"))
+                var conn = new MySQLiteDbContext();
+                var a = conn.TableAlgorithm.ToList();
+                MessageBox.Show(a.Count().ToString());
+                /*
+                var A = new TableAlgorithm();
+                A.Name = "SHA512";
+                conn.TableAlgorithm.Add(A);
+                conn.SaveChanges();*/
             }
             catch (Exception e)
-            { MessageBox.Show(e.Message); }
+            {
+                MessageBox.Show("Error: " + e.Message);
+                MessageBox.Show("Error: " + e.InnerException);
+            }
         }
+
+
 
         private string buildHashString(byte[] data)
         {

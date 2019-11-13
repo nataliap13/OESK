@@ -9,11 +9,11 @@ namespace OESK
 {
     //source
     //https://stackoverflow.com/questions/15963726/getting-context-is-not-constructible-add-a-default-constructor-or-provide-an-i
-    class SQLiteConnectionFactory : IDbContextFactory<SQLiteConnection>
+    class SQLiteConnectionFactory : IDbContextFactory<MySQLiteDbContext>
     {
-        public SQLiteConnection Create()
+        public MySQLiteDbContext Create()
         {
-            return new SQLiteConnection("db.db");
+            return new MySQLiteDbContext();
         }
     }
 }
