@@ -11,8 +11,6 @@ namespace OESK
     {
         [Key]
         public int ID { get; set; }
-        public int IDTest { get; set; }//FK
-        public virtual TableTest TableTest { get; set; }
 
         public int IDAlgorithm { get; set; }//FK
         public virtual TableAlgorithm TableAlgorithm { get; set; }
@@ -23,7 +21,7 @@ namespace OESK
 
 
         public string CalculationTime { get; set; }
-
-       
+        public string RamFrequency { get; set; }
+        public string RamCLDelay { get; set; }
     }
 }

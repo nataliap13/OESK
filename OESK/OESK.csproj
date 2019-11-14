@@ -91,7 +91,6 @@
     </ApplicationDefinition>
     <Compile Include="MySQLiteDbContext.cs" />
     <Compile Include="SQLiteConfiguration.cs" />
-    <Compile Include="TableTest.cs" />
     <Compile Include="TableTestResult.cs" />
     <Compile Include="TableText.cs" />
     <Page Include="MainWindow.xaml">
@@ -127,7 +126,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="db.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

@@ -5,13 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:OESK"
         mc:Ignorable="d"
-        Title="MainWindow" MinWidth="650" MinHeight="300" Width="650" Height="300">
+        Title="Test szybkości działania wybranych funkcji skrótu" MinWidth="650" MinHeight="300" Width="650" Height="300">
     <Grid>
         <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Test szybkości działania wybranych funkcji skrótu" VerticalAlignment="Top"/>
-
-        <TextBlock HorizontalAlignment="Left" Margin="10,109,0,0" TextWrapping="Wrap" Text="Tekst do przetworzenia:" VerticalAlignment="Top"/>
-        <TextBox Name="UserTxtBox" Margin="10,135,10,22" TextWrapping="Wrap" Text="Mój tekst"/>
-        <Button Name="BtnStart" Content="Start" HorizontalAlignment="Left" Margin="139,109,0,0" VerticalAlignment="Top" Width="71" Click="BtnStart_Click"/>
+        <TextBlock Name="TxtBlockFullTime" HorizontalAlignment="Left" Margin="215,113,0,0" TextWrapping="Wrap" Text="Czas pełny" VerticalAlignment="Top"/>
 
         <TextBlock Name="MD5TxtBlockTime" HorizontalAlignment="Left" Margin="10,38,0,0" TextWrapping="Wrap" Text="Czas" VerticalAlignment="Top" Width="83"/>
         <TextBlock Name="MD5Title" HorizontalAlignment="Left" Margin="104,38,0,0" TextWrapping="Wrap" Text="MD5" VerticalAlignment="Top" Width="45"/>
@@ -24,5 +21,12 @@
         <TextBlock Name="SHA256TxtBlockTime" HorizontalAlignment="Left" Margin="10,88,0,0" TextWrapping="Wrap" Text="Czas" VerticalAlignment="Top" Width="83"/>
         <TextBlock Name="SHA256Title" HorizontalAlignment="Left" Margin="104,88,0,0" TextWrapping="Wrap" Text="SHA256" VerticalAlignment="Top" Width="45"/>
         <TextBlock Name="SHA256TxtBlockHash" Margin="177,88,10,0" TextWrapping="Wrap" Text="Tekst" VerticalAlignment="Top"/>
+
+        <TextBlock HorizontalAlignment="Left" Margin="10,109,0,0" TextWrapping="Wrap" Text="Tekst do przetworzenia:" VerticalAlignment="Top"/>
+        <TextBox Name="UserTxtBox" Margin="10,135,10,22" TextWrapping="Wrap" Text="Mój tekst"/>
+        <Button Name="BtnStart" Content="Start" HorizontalAlignment="Left" Margin="139,109,0,0" VerticalAlignment="Top" Width="71" Click="BtnStart_Click"/>
+
+        <Button Name="BtnStartStandardTest" Content="Uruchom pełny test" Margin="0,109,10,0" VerticalAlignment="Top" HorizontalAlignment="Right" Width="108" Click="BtnStartStandardTest_Click" />
+
     </Grid>
 </Window>

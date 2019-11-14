@@ -28,7 +28,6 @@ namespace OESK
         }
 
         public DbSet<TableAlgorithm> TableAlgorithm { get; set; }
-        public DbSet<TableTest> TableTest { get; set; }
         public DbSet<TableTestResult> TableTestResult { get; set; }
         public DbSet<TableText> TableText { get; set; }
     }
