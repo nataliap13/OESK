@@ -203,7 +203,7 @@ namespace OESK
                         GetSHA256Hash(text, out timeOfCalculation);
                         SaveTestToDatabase(text, timeOfCalculation, "SHA256");
                     }
-                    text += text[0];
+                    text = new String('A', 1000 * (i + 1));
                 }
                 MessageBox.Show("Test zakończony poprawnie.");
             }
