@@ -29,22 +29,7 @@ namespace OESK
         private SHA256 sha256Hash = SHA256.Create();
         private MySQLiteDbContext conn = new MySQLiteDbContext();
         public MainWindow()
-        {
-            InitializeComponent();
-            /*
-            try
-            {
-                //using (var conn = new SQLiteConnection("Data Source=db.db; Version=3; New=False; Compress=True;"))
-                //var conn = new MySQLiteDbContext();
-                var a = conn.TableAlgorithm.ToList();
-                MessageBox.Show(a.Count().ToString());
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error: " + e.Message);
-                MessageBox.Show("Error: " + e.InnerException);
-            }*/
-        }
+        { InitializeComponent(); }
 
         private string buildHashString(byte[] data)
         {
@@ -61,7 +46,7 @@ namespace OESK
             return sBuilder.ToString();
         }
 
-        private string GetMd5Hash(string input, out TimeSpan timeSpan)
+        private string GetMd5Hash(ref string input, out TimeSpan timeSpan)
         {
             #region set priority
             //use the first Core/Processor for the test
@@ -84,7 +69,7 @@ namespace OESK
             timeSpan = stopWatch.Elapsed;
             return buildHashString(data);
         }
-        private string GetSHA1Hash(string input, out TimeSpan timeSpan)
+        private string GetSHA1Hash(ref string input, out TimeSpan timeSpan)
         {
             #region set priority
             //use the first Core/Processor for the test
@@ -107,7 +92,7 @@ namespace OESK
             timeSpan = stopWatch.Elapsed;
             return buildHashString(data);
         }
-        private string GetSHA256Hash(string input, out TimeSpan timeSpan)
+        private string GetSHA256Hash(ref string input, out TimeSpan timeSpan)
         {
             #region set priority
             //use the first Core/Processor for the test
@@ -134,81 +119,95 @@ namespace OESK
         private void BtnStart_Click(object sender, RoutedEventArgs e)
         {
             var begin = DateTime.Now;
-            TimeSpan timeOfCalculation;
+            TimeSpan MD5Time;
+            TimeSpan SHA1Time;
+            TimeSpan SHA256Time;
             var text = UserTxtBox.Text;
-            string hash = GetMd5Hash(text, out timeOfCalculation);
+            var IDText = SearchForTextInDatabaseAddIfNotExists(text);
+
+            string hash = GetMd5Hash(ref text, out MD5Time);
             MD5TxtBlockHash.Text = hash;
-            MD5TxtBlockTime.Text = ((int)timeOfCalculation.TotalSeconds).ToString() + ","
-                + String.Format("{0:fffffff}", timeOfCalculation); ;
+            MD5TxtBlockTime.Text = ((int)MD5Time.TotalSeconds).ToString() + ","
+                + String.Format("{0:fffffff}", MD5Time); ;
             //MD5TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
-            SaveTestToDatabase(text, timeOfCalculation, "MD5");
 
-            hash = GetSHA1Hash(text, out timeOfCalculation);
+            hash = GetSHA1Hash(ref text, out SHA1Time);
             SHA1TxtBlockHash.Text = hash;
-            SHA1TxtBlockTime.Text = ((int)timeOfCalculation.TotalSeconds).ToString() + ","
-                + String.Format("{0:fffffff}", timeOfCalculation);
+            SHA1TxtBlockTime.Text = ((int)SHA1Time.TotalSeconds).ToString() + ","
+                + String.Format("{0:fffffff}", SHA1Time);
             //SHA1TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
-            SaveTestToDatabase(text, timeOfCalculation, "SHA1");
 
-            hash = GetSHA256Hash(text, out timeOfCalculation);
+            hash = GetSHA256Hash(ref text, out SHA256Time);
             SHA256TxtBlockHash.Text = hash;
-            SHA256TxtBlockTime.Text = ((int)timeOfCalculation.TotalSeconds).ToString() + ","
-                + String.Format("{0:fffffff}", timeOfCalculation);
+            SHA256TxtBlockTime.Text = ((int)SHA256Time.TotalSeconds).ToString() + ","
+                + String.Format("{0:fffffff}", SHA256Time);
             //SHA256TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
-            SaveTestToDatabase(text, timeOfCalculation, "SHA256");
+            SaveTestToDatabase(ref IDText, ref MD5Time, ref SHA1Time, ref SHA256Time);
             TxtBlockFullTime.Text = (DateTime.Now - begin).ToString();
         }
 
-        private void SaveTestToDatabase(string sourceText, TimeSpan timeOfCalculation, string AlgorithmName)
+        private void SaveTestToDatabase(ref int IDText, ref TimeSpan MD5Time, ref TimeSpan SHA1Time, ref TimeSpan SHA256Time)
         {
-            var listOfTexts = conn.TableText.Where(x => x.Text == sourceText).ToList();
-            var IDText = 0;
-            if (listOfTexts.Count() == 0)
-            {
-                var entryText = new TableText();
-                entryText.Text = sourceText;
-                entryText = conn.TableText.Add(entryText);
-                IDText = entryText.IDText;
-            }
-            else { IDText = listOfTexts.First().IDText; }
-
             var entryTestResult = new TableTestResult();
-            entryTestResult.IDAlgorithm = conn.TableAlgorithm.Where(x => x.Name == AlgorithmName).First().IDAlgorithm;
             entryTestResult.IDText = IDText;
-            entryTestResult.CalculationTime = ((int)timeOfCalculation.TotalSeconds).ToString() + ","
-                + String.Format("{0:fffffff}", timeOfCalculation);
+            entryTestResult.MD5CalculationTime = ((int)MD5Time.TotalSeconds).ToString() + "," + String.Format("{0:fffffff}", MD5Time);
+            entryTestResult.SHA1CalculationTime = ((int)SHA1Time.TotalSeconds).ToString() + "," + String.Format("{0:fffffff}", SHA1Time);
+            entryTestResult.SHA256CalculationTime = ((int)SHA256Time.TotalSeconds).ToString() + "," + String.Format("{0:fffffff}", SHA256Time);
             entryTestResult = conn.TableTestResult.Add(entryTestResult);
             try
             { conn.SaveChanges(); }
             catch (Exception e)
-            { MessageBox.Show(e.Message); }
+            { MessageBox.Show("Nie mozna zapisac do db: " + e.Message); }
+        }
+
+        private int SearchForTextInDatabaseAddIfNotExists(string text)
+        {
+            //search for this text in database
+            var listOfTexts = conn.TableText.Where(x => x.Text == text).ToList();
+            var IDText = 0;
+            if (listOfTexts.Count() == 0)
+            {
+                var entryText = new TableText();
+                entryText.Text = text;
+                entryText = conn.TableText.Add(entryText);
+                try
+                { conn.SaveChanges(); }
+                catch (Exception ex)
+                { MessageBox.Show("Nie mozna zapisac do db: " + ex.Message); }
+                IDText = entryText.IDText;
+            }
+            else { IDText = listOfTexts.First().IDText; }
+            return IDText;
         }
 
         private void BtnStartStandardTest_Click(object sender, RoutedEventArgs e)
         {
-            TimeSpan timeOfCalculation;
-            var text = "A";
+            var begin = DateTime.Now;
             try
             {
-                for (int i = 0; i < 10; i++)
+                for (int i = 0; i < 7; i++)
                 {
-                    for (int j = 0; j < 10; j++)
+                    //text += new StringBuilder(text.Length * 9).Insert(0, text, 9).ToString();
+                    //text = string.Empty;
+                    var text = new String('A', Convert.ToInt32(Math.Pow(10, i)));
+                    var IDText = SearchForTextInDatabaseAddIfNotExists(text);
+
+                    for (int j = 0; j < 100; j++)
                     {
-                        GetMd5Hash(text, out timeOfCalculation);
-                        SaveTestToDatabase(text, timeOfCalculation, "MD5");
-
-                        GetSHA1Hash(text, out timeOfCalculation);
-                        SaveTestToDatabase(text, timeOfCalculation, "SHA1");
-
-                        GetSHA256Hash(text, out timeOfCalculation);
-                        SaveTestToDatabase(text, timeOfCalculation, "SHA256");
+                        TimeSpan MD5Time;
+                        TimeSpan SHA1Time;
+                        TimeSpan SHA256Time;
+                        GetMd5Hash(ref text, out MD5Time);
+                        GetSHA1Hash(ref text, out SHA1Time);
+                        GetSHA256Hash(ref text, out SHA256Time);
+                        SaveTestToDatabase(ref IDText, ref MD5Time, ref SHA1Time, ref SHA256Time);
                     }
-                    text = new String('A', 1000 * (i + 1));
                 }
+                TxtBlockFullTime.Text = (DateTime.Now - begin).ToString();
                 MessageBox.Show("Test zakończony poprawnie.");
             }
             catch (Exception ex)
-            { MessageBox.Show(ex.Message); }
+            { MessageBox.Show(ex.Message); MessageBox.Show(ex.InnerException.Message); }
         }
     }
 }

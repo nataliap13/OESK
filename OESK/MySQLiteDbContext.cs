@@ -26,8 +26,7 @@ namespace OESK
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
             base.OnModelCreating(modelBuilder);
         }
-
-        public DbSet<TableAlgorithm> TableAlgorithm { get; set; }
+        
         public DbSet<TableTestResult> TableTestResult { get; set; }
         public DbSet<TableText> TableText { get; set; }
     }
