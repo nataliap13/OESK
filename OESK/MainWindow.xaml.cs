@@ -152,7 +152,6 @@ namespace OESK
 
             hash = GetSHA256Hash(text, out timeOfCalculation);
             SHA256TxtBlockHash.Text = hash;
-            timeOfCalculation = timeOfCalculation.Add(new TimeSpan(0, 0, 61));
             SHA256TxtBlockTime.Text = ((int)timeOfCalculation.TotalSeconds).ToString() + ","
                 + String.Format("{0:fffffff}", timeOfCalculation);
             //SHA256TxtBlockTime.Text = String.Format("{0:mm\\:ss\\:fffffff}", timeOfCalculation);
